@@ -1,37 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.c                                            :+:      :+:    :+:   */
+/*   matrix_projection.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kbarbry <kbarbry@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/22 13:04:31 by kbarbry           #+#    #+#             */
-/*   Updated: 2021/11/24 10:07:04 by kbarbry          ###   ########.fr       */
+/*   Created: 2021/11/28 09:20:16 by kbarbry           #+#    #+#             */
+/*   Updated: 2021/11/28 09:51:17 by kbarbry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "fdf.h"
+#include "../fdf.h"
 
-static void	ft_putstr(char *s)
+void	matrix_projection(t_matrix *m, double fov, double near, double far)
 {
-	int	i;
+    int scale;
 
-	i = 0;
-	if (!s)
-		return ;
-	while (s[i])
-	{
-		write(1, &s[i], 1);
-		i++;
-	}
-	write(1, "\n", 1);
-}
-
-int    ft_error(int nbr)
-{
-    if (nbr == 1)
-        ft_putstr("Can only work with one file");
-    else if (nbr == 2)
-        ft_putstr("Parsing error");
-	return (0);
+    matrix_identity(m);
+    scale = 1 / (tan((fov / 2) * (M_PI / 180)));
+    m->x[0] = scale;
+    m->y[1] = scale;
+    m->z[2] = - (far / (far - near));
+    m->t[2] = - ((far * near) / (far - near));
+    m->z[3] = -1;
+    m->t[3] = 0;
 }

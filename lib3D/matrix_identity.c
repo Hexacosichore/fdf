@@ -1,37 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.c                                            :+:      :+:    :+:   */
+/*   matrix_identity.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kbarbry <kbarbry@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/22 13:04:31 by kbarbry           #+#    #+#             */
-/*   Updated: 2021/11/24 10:07:04 by kbarbry          ###   ########.fr       */
+/*   Created: 2021/11/24 10:45:21 by kbarbry           #+#    #+#             */
+/*   Updated: 2021/11/24 13:36:10 by kbarbry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "fdf.h"
+#include "../fdf.h"
 
-static void	ft_putstr(char *s)
+void	matrix_identity(t_matrix *matrix)
 {
-	int	i;
-
-	i = 0;
-	if (!s)
-		return ;
-	while (s[i])
-	{
-		write(1, &s[i], 1);
-		i++;
-	}
-	write(1, "\n", 1);
-}
-
-int    ft_error(int nbr)
-{
-    if (nbr == 1)
-        ft_putstr("Can only work with one file");
-    else if (nbr == 2)
-        ft_putstr("Parsing error");
-	return (0);
+	matrix_bzero(matrix);
+	matrix->x[0] = 1;
+	matrix->y[1] = 1;
+	matrix->z[2] = 1;
+	matrix->t[3] = 1;
 }

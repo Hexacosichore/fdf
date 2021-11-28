@@ -1,37 +1,48 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.c                                            :+:      :+:    :+:   */
+/*   parsing_utilities.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kbarbry <kbarbry@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/22 13:04:31 by kbarbry           #+#    #+#             */
-/*   Updated: 2021/11/24 10:07:04 by kbarbry          ###   ########.fr       */
+/*   Created: 2021/11/23 12:51:31 by kbarbry           #+#    #+#             */
+/*   Updated: 2021/11/23 15:03:50 by kbarbry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-static void	ft_putstr(char *s)
+int	ft_strlen(const char *s)
 {
-	int	i;
+	int	len;
 
-	i = 0;
-	if (!s)
-		return ;
-	while (s[i])
-	{
-		write(1, &s[i], 1);
-		i++;
-	}
-	write(1, "\n", 1);
+	len = 0;
+	while (s[len])
+		len++;
+	return (len);
 }
 
-int    ft_error(int nbr)
+int	ft_atoi(char *nptr)
 {
-    if (nbr == 1)
-        ft_putstr("Can only work with one file");
-    else if (nbr == 2)
-        ft_putstr("Parsing error");
-	return (0);
+	unsigned int	i;
+	unsigned int	result;
+	int				sign;
+
+	i = 0;
+	sign = 1;
+	result = 0;
+	if (!nptr)
+		return (result);
+	if (nptr[i] == '-' || nptr[i] == '+')
+	{
+		if (nptr[i] == '-')
+			sign *= -1;
+		i += 1;
+	}
+	while (nptr[i] >= '0' && nptr[i] <= '9')
+	{
+		result = (result * 10) + (nptr[i] - '0');
+		i++;
+	}
+	return (result * sign);
 }

@@ -1,37 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.c                                            :+:      :+:    :+:   */
+/*   matrix_bzero.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kbarbry <kbarbry@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/22 13:04:31 by kbarbry           #+#    #+#             */
-/*   Updated: 2021/11/24 10:07:04 by kbarbry          ###   ########.fr       */
+/*   Created: 2021/11/24 11:30:16 by kbarbry           #+#    #+#             */
+/*   Updated: 2021/11/24 13:56:59 by kbarbry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "fdf.h"
+#include "../fdf.h"
 
-static void	ft_putstr(char *s)
+void	matrix_bzero(t_matrix *matrix)
 {
 	int	i;
 
 	i = 0;
-	if (!s)
-		return ;
-	while (s[i])
+	while (i < 4)
 	{
-		write(1, &s[i], 1);
+		matrix->x[i] = 0;
+		matrix->y[i] = 0;
+		matrix->z[i] = 0;
+		matrix->t[i] = 0;
 		i++;
 	}
-	write(1, "\n", 1);
-}
-
-int    ft_error(int nbr)
-{
-    if (nbr == 1)
-        ft_putstr("Can only work with one file");
-    else if (nbr == 2)
-        ft_putstr("Parsing error");
-	return (0);
 }

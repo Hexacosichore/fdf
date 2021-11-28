@@ -6,32 +6,38 @@
 /*   By: kbarbry <kbarbry@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/17 13:45:41 by kbarbry           #+#    #+#             */
-/*   Updated: 2021/11/22 17:56:26 by kbarbry          ###   ########.fr       */
+/*   Updated: 2021/11/28 20:39:22 by kbarbry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-void	my_mlx_pixel_put(t_data *data, int x, int y, int color)
+void	my_mlx_pixel_put(t_doc *d, int x, int y, int color)
 {
 	char	*dst;
 
-	dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
+	if (x < 0 || y < 0 || x > WIN_L - 1 || y > WIN_H - 1)
+		return ;
+	dst = d->addr + (y * d->line_length + x * (d->bits_per_pixel / 8));
 	*(unsigned int *)dst = color;
 }
 
-void	plot_line(t_pts pt0, t_pts pt1, t_data *img, int color)
+void	plot_line(t_vector pt0, t_vector pt1, t_doc *data, int color)
 {
 	t_plot_line	line;
 
-	line.dx = abs (pt1.x - pt0.x);
+	line.dx = fabs(pt1.x - pt0.x);
 	line.sx = (pt0.x < pt1.x) - (pt0.x >= pt1.x);
-	line.dy = -abs (pt1.y - pt0.y);
+	line.dy = -fabs(pt1.y - pt0.y);
 	line.sy = (pt0.y < pt1.y) - (pt0.y >= pt1.y);
 	line.err = line.dx + line.dy;
+	if (pt0.x == pt1.x)
+		pt1.x += 1;
+	if (pt0.y == pt1.y)
+		pt1.y += 1;
 	while (pt0.x != pt1.x && pt0.y != pt1.y)
 	{
-		my_mlx_pixel_put(img, pt0.x, pt0.y, color);
+		my_mlx_pixel_put(data, pt0.x, pt0.y, color);
 		line.e2 = 2 * line.err;
 		if (line.e2 >= line.dy)
 		{
@@ -46,37 +52,55 @@ void	plot_line(t_pts pt0, t_pts pt1, t_data *img, int color)
 	}
 }
 
-// int	main(void)
-// {
-// 	void	*mlx;
-// 	void	*mlx_win;
-// 	t_data	img;
-// 	t_pts	pt1;
-// 	t_pts	pt2;
+void	ft_draw_modif(t_doc *data)
+{
+	mlx_destroy_image(data->mlx, data->img);
+	data->img = mlx_new_image(data->mlx, WIN_L, WIN_H);
+	data->addr = mlx_get_data_addr(data->img, &data->bits_per_pixel,
+			&data->line_length, &data->endian);
+	ft_draw(data);
+	mlx_put_image_to_window(data->mlx, data->mlx_win, data->img, 0, 0);
+}
 
-// 	pt1.x = 0;
-// 	pt1.y = 1079;
-// 	pt2.x = 1919;
-// 	pt2.y = 0;
-// 	mlx = mlx_init();
-// 	mlx_win = mlx_new_window(mlx, 1920, 1080, "MA BITE");
-// 	img.img = mlx_new_image(mlx, 1920, 1080);
-// 	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
-// 			&img.endian);
-// 	plot_line(pt1, pt2, &img, 0x00FFFF00);
-// 	mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
-// 	mlx_loop(mlx);
-// }
+int	ft_key_hook(int keycode, t_doc *data)
+{
+	if (keycode == ESC)
+		exit(0);
+	else if (keycode == UP)
+		data->ovect->trans_v->y -=5;
+	else if (keycode == DOWN)
+		data->ovect->trans_v->x += 5;
+	else if (keycode == RIGHT)
+		data->ovect->trans_v->x += 5;
+	else if (keycode == LEFT)
+		data->ovect->trans_v->x -= 5;
+	else if (keycode == ZOOM)
+		data->ovect->scale_v->z += 1;
+	else if (keycode == DEZOOM)
+		if (data->ovect->scale_v->z > 1.0f)
+			data->ovect->scale_v->z -= 1.0f;
+	dprintf(1, "%f ", data->ovect->trans_v->x);
+	ft_draw_modif(data);
+	return (0);
+}
 
 int	main(int argc, char **argv)
 {
 	t_doc	*data;
 
-	data = malloc(sizeof(t_doc));
-	if (argc != 2 || !data)
+	if (argc != 2)
 		return (ft_error(1));
-	ft_parse(argv[1], data);
-	if (!data->map)
+	data = malloc(sizeof(t_doc));
+	if (!data || !ft_parse(argv[1], data) || !ft_init_ovect(data))
 		return (ft_error(2));
-	free(data);
+	data->mlx = mlx_init();
+	data->mlx_win = mlx_new_window(data->mlx, 1080, 1080, "MA BITE");
+	data->img = mlx_new_image(data->mlx, WIN_L, WIN_H);
+	data->addr = mlx_get_data_addr(data->img, &data->bits_per_pixel, &data->line_length,
+			&data->endian);
+	ft_draw(data);
+	mlx_put_image_to_window(data->mlx, data->mlx_win, data->img, 0, 0);
+	mlx_key_hook(data->mlx_win, ft_key_hook, data);
+	mlx_loop(data->mlx);
+	ft_free(data);
 }

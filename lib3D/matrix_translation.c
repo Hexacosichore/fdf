@@ -1,37 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.c                                            :+:      :+:    :+:   */
+/*   matrix_translation.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kbarbry <kbarbry@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/22 13:04:31 by kbarbry           #+#    #+#             */
-/*   Updated: 2021/11/24 10:07:04 by kbarbry          ###   ########.fr       */
+/*   Created: 2021/11/24 11:57:04 by kbarbry           #+#    #+#             */
+/*   Updated: 2021/11/28 20:37:06 by kbarbry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "fdf.h"
+#include "../fdf.h"
 
-static void	ft_putstr(char *s)
+void	matrix_translation(t_matrix *matrix, t_vector *trans_v)
 {
-	int	i;
-
-	i = 0;
-	if (!s)
-		return ;
-	while (s[i])
-	{
-		write(1, &s[i], 1);
-		i++;
-	}
-	write(1, "\n", 1);
+	matrix->x[3] = trans_v->x;
+	matrix->y[3] = trans_v->y;
+	matrix->z[3] = trans_v->z;
+	matrix->t[3] = 1;
 }
 
-int    ft_error(int nbr)
+void	ft_translate(t_matrix *matrix, t_doc *data)
 {
-    if (nbr == 1)
-        ft_putstr("Can only work with one file");
-    else if (nbr == 2)
-        ft_putstr("Parsing error");
-	return (0);
+	t_matrix	mat;
+
+	matrix_identity(&mat);
+	matrix_translation(&mat, data->ovect->trans_v);
+	matrix_x_matrix(&mat, matrix);
 }
